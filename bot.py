@@ -69,7 +69,7 @@ async def addresses_settings(callback: CallbackQuery, state: FSMContext):
     config = read_user_config(user_id=user_id)
 
     if len(config['addresses']) == 0:
-        await callback.message.edit_text('У вас не указан ни один адрес доставки.\nДобавьте адреса ниже:' 
+        await callback.message.edit_text('У вас не указан ни один адрес доставки.\nДобавьте адреса ниже:', 
                                          reply_markup=addresses_keyboard())
 
     await callback.message.edit_text('',)
@@ -99,7 +99,7 @@ async def add_address_text(message: Message, state: FSMContext):
 
     new_address = Address.fron_dict(
         {
-            "label": address_label
+            "label": address_label,
             "address": address
         }
     )
