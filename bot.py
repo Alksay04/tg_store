@@ -87,7 +87,7 @@ async def add_address_label(message: Message, state: FSMContext):
 
     await message.answer(f'Укажите адрес для {address_label}')
     await state.set_state(SettingStates.add_address_text)
-    await state.set_data('label': address_label)
+    await state.set_data({'label': address_label})
 
 @dp.message(F.text, SettingStates.add_address_text)
 async def add_address_text(message: Message, state: FSMContext):
