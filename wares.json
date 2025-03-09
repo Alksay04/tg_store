@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Шаурма с вокзала",
+        "price": 15,
+        "description": "пон",
+        "imageURL": "shaurma.jfif"
+    },
+    {
+        "name": "Шаурма не с вокзала",
+        "price": 20,
+        "description": "пон",
+        "imageURL": "shaurma.jfif"
+    },
+    {
+        "name": "Не шаурма",
+        "price": 15000,
+        "description": "пон",
+        "imageURL": "shaurma.jfif"
+    }
+]

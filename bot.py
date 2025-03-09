@@ -5,9 +5,10 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from dotenv import dotenv_values
 from users.users import read_user_config, write_user_config, update_user_config, user_exists
-from keyboards.keyboards import start_keyboard, settings_keyboard, addresses_keyboard
+from keyboards.keyboards import start_keyboard, settings_keyboard, addresses_keyboard, back_to_menu_keyboard, catalogue_keyboard
 from states.states import SettingStates
 from users.address import Address
+from wares import wares, Ware
 
 config = dotenv_values(".env")
 bot = Bot(token=config["BOT_TOKEN"])
@@ -60,7 +61,8 @@ async def new_name(message: Message, state: FSMContext):
         'first_name': new_name
     }
     update_user_config(user_id=user_id, keys_to_update=keys_to_update)
-    await message.answer(text=f'{new_name}, Вашe имя успешно изменено!')
+    await message.answer(text=f'{new_name}, Вашe имя успешно изменено!', 
+                         reply_markup=back_to_menu_keyboard())
     await state.set_state(None)
 
 @dp.callback_query(F.data=="addresses_settings")
@@ -109,6 +111,22 @@ async def add_address_text(message: Message, state: FSMContext):
         'addresses': config['addresses']
     }
     update_user_config(user_id=user_id, keys_to_update=keys_to_update)
+
+
+@dp.callback_query(F.data=='catalogue')
+async def catalogue(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.message.chat.id
+    user = read_user_config(user_id=user_id)
+    name = user['first_name']
+    await callback.message.edit_text(f'{name}, выберите лучшую шаурму', 
+                                     reply_markup=catalogue_keyboard(wares))
+    
+@dp.callback_query(F.data.startswith('ware_'))
+async def ware_info(callback: CallbackQuery):
+    ware_id = int(callback.data.split('_')('-'))
+    ware = Ware.get_ware_by_id(wares, ware_id)
+
+    await callback.message.edit_text(ware.get_ware_details())
 
 async def main():
     print('Я запущен!')
