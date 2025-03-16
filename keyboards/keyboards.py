@@ -39,8 +39,13 @@ def catalogue_keyboard(wares):
     builder = InlineKeyboardBuilder()
 
     for ware in wares:
-        builder.add(InlineKeyboardBuilder(text=ware.name, callback_data=f'ware_{ware.id}'))
+        builder.add(InlineKeyboardButton(text=ware.name, callback_data=f'ware_{ware.id}'))
 
     builder.add(InlineKeyboardButton(text='Вернуться в меню', callback_data='back_to_menu'))
     builder.adjust(1)
+    return builder.as_markup()
+
+def ware_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.add(InlineKeyboardButton(text='Обратно', callback_data='back_to_catalogue'))
     return builder.as_markup()

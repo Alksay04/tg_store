@@ -1,14 +1,14 @@
 import asyncio
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters.command import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto, InputFile
 from aiogram.fsm.context import FSMContext
 from dotenv import dotenv_values
 from users.users import read_user_config, write_user_config, update_user_config, user_exists
-from keyboards.keyboards import start_keyboard, settings_keyboard, addresses_keyboard, back_to_menu_keyboard, catalogue_keyboard
+from keyboards.keyboards import start_keyboard, settings_keyboard, addresses_keyboard, back_to_menu_keyboard, catalogue_keyboard, ware_keyboard
 from states.states import SettingStates
 from users.address import Address
-from wares import wares, Ware
+from wares.wares import wares, Ware
 
 config = dotenv_values(".env")
 bot = Bot(token=config["BOT_TOKEN"])
@@ -86,10 +86,10 @@ async def add_address_label(message: Message, state: FSMContext):
     address_label = message.text
 
     await message.answer(f'Укажите адрес для {address_label}')
-    await state.set_state(SettingStates.add_address_text)
+    await state.set_state(SettingStates.add_address)
     await state.set_data({'label': address_label})
 
-@dp.message(F.text, SettingStates.add_address_text)
+@dp.message(F.text, SettingStates.add_address)
 async def add_address_text(message: Message, state: FSMContext):
     address = message.text
 
@@ -121,12 +121,25 @@ async def catalogue(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(f'{name}, выберите лучшую шаурму', 
                                      reply_markup=catalogue_keyboard(wares))
     
+    
+@dp.callback_query(F.data=='back_to_catalogue')
+async def back_to_catalogue(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.message.chat.id
+    user = read_user_config(user_id=user_id)
+    name = user['first_name']
+    await callback.message.edit_text(f'{name}, выберите лучшую шаурму', 
+                                     reply_markup=catalogue_keyboard(wares))
+    
 @dp.callback_query(F.data.startswith('ware_'))
 async def ware_info(callback: CallbackQuery):
-    ware_id = int(callback.data.split('_')('-'))
-    ware = Ware.get_ware_by_id(wares, ware_id)
+    ware_id = int(callback.data.split('_')[-1])
+    ware: Ware = Ware.get_ware_by_id(wares, ware_id)
+    
+    #Для отправки фото:
+    #await callback.message.answer_photo(photo=ware.inputImage)
 
-    await callback.message.edit_text(ware.get_ware_details())
+    await callback.message.edit_text(ware.get_ware_detail(), 
+                                     reply_markup=ware_keyboard())
 
 async def main():
     print('Я запущен!')

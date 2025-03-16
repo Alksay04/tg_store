@@ -1,3 +1,5 @@
+from aiogram.types import FSInputFile
+
 import json
 import os
 class Ware:
@@ -8,10 +10,15 @@ class Ware:
         self.price = price
         self.description = description
         self.imageURL = imageURL
+        
+        img_folder_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'img')
+        image_path = os.path.join(img_folder_path, self.imageURL)
+        self.inputImage = FSInputFile(image_path)
+        
         self.id = id
 
     @classmethod
-    def from_dict(cls, data: dict):
+    def from_dict(cls, data: dict, id):
         return Ware(name=data['name'], 
                     price=data['price'], 
                     description=data['description'],
